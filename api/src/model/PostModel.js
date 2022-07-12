@@ -31,6 +31,6 @@ const postScheme = Schema(
   { versionKey: false, timestamps: true },
 );
 
-const Post = new model("Post", postScheme);
+const PostModel = new model("Post", postScheme);
 
-module.exports = Post;
+module.exports = PostModel;

@@ -2,32 +2,28 @@
 const categoryRoutes = require("express").Router();
 
 //internal lib import
+const { checkLogin } = require("../middleware/authVerify");
 const {
   createCategory,
   selectCategory,
-  updateCategory,
   deleteCategory,
   selectAllCategory,
+  updateCategory,
 } = require("../controller/categoryController");
-const { checkLogin } = require("../middleware/authVerify");
 
-//createcategory
-categoryRoutes.post("/createcategory", checkLogin, createCategory);
+//createCategory
+categoryRoutes.post("/createCategory", checkLogin, createCategory);
 
-//selectcategory
-categoryRoutes.get("/selectcategory/:categoryId", checkLogin, selectCategory);
+//selectCategory
+categoryRoutes.get("/selectCategory/:tagId", selectCategory);
 
-//updatecategory
-categoryRoutes.patch("/updatecategory/:categoryId", checkLogin, updateCategory);
+//updateCategory
+categoryRoutes.patch("/updateCategory/:tagId", checkLogin, updateCategory);
 
-// //deletecategory
-categoryRoutes.delete(
-  "/deletecategory/:categoryId",
-  checkLogin,
-  deleteCategory,
-);
+// //deleteCategory
+categoryRoutes.delete("/deleteCategory/:tagId", checkLogin, deleteCategory);
 
-//selectAllcategory
-categoryRoutes.get("/selectAllcategory", checkLogin, selectAllCategory);
+//selectAllCategory
+categoryRoutes.get("/selectAllCategory", selectAllCategory);
 
 module.exports = categoryRoutes;

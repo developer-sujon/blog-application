@@ -2,6 +2,7 @@
 const tagRoutes = require("express").Router();
 
 //internal lib import
+const { checkLogin } = require("../middleware/authVerify");
 const {
   createTag,
   selectTag,
@@ -9,13 +10,12 @@ const {
   deleteTag,
   selectAllTag,
 } = require("../controller/TagController");
-const { checkLogin } = require("../middleware/authVerify");
 
 //createTag
 tagRoutes.post("/createTag", checkLogin, createTag);
 
 //selectTag
-tagRoutes.get("/selectTag/:tagId", checkLogin, selectTag);
+tagRoutes.get("/selectTag/:tagId", selectTag);
 
 //updateTag
 tagRoutes.patch("/updateTag/:tagId", checkLogin, updateTag);
@@ -24,6 +24,6 @@ tagRoutes.patch("/updateTag/:tagId", checkLogin, updateTag);
 tagRoutes.delete("/deleteTag/:tagId", checkLogin, deleteTag);
 
 //selectAllTag
-tagRoutes.get("/selectAllTag", checkLogin, selectAllTag);
+tagRoutes.get("/selectAllTag", selectAllTag);
 
 module.exports = tagRoutes;

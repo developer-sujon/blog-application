@@ -15,6 +15,6 @@ const tagScheme = Schema(
   { versionKey: false, timestamps: true },
 );
 
-const Tag = new model("Tag", tagScheme);
+const TagModel = new model("Tag", tagScheme);
 
-module.exports = Tag;
+module.exports = TagModel;

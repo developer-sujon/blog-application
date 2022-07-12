@@ -1,133 +1,230 @@
 //external lib import
-const ObjectId = require("mongodb").ObjectID;
+const mongoose = require("mongoose");
+const ObjectId = mongoose.Types.ObjectId;
 
 //internal lib import
-const Post = require("../model/Post");
+const PostModel = require("../model/PostModel");
 
 //createPost
-exports.createPost = async (req, res) => {
-  try {
-    const newPost = new Post({ ...req.body, user: req.userName });
-    await newPost.save();
-    res.status(201).json({ status: "success", data: "post create successful" });
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ status: "fail", data: error });
-  }
+exports.createPost = (req, res) => {
+  console.log(req.userName);
+
+  PostModel.create({ ...req.body, user: req.userName }, (err, data) => {
+    if (err) {
+      console.log(err);
+      res
+        .status(500)
+        .json({ status: "fail", data: "there was a server side error" });
+    } else {
+      res.status(201).json({ status: "success", data });
+    }
+  });
 };
 
 //selectPost
-exports.selectPost = async (req, res) => {
-  try {
-    const post = await Post.aggregate([
-      {
-        $match: { _id: ObjectId(req.params.postId), user: ObjectId(req.id) },
-      },
-    ]);
-
-    if (post && post.length > 0) {
-      res.json({ status: "success", data: post });
-    } else {
-      res.status(404).json({ status: "fail", data: "post not found" });
-    }
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ status: "fail", data: error });
-  }
+exports.selectPost = (req, res) => {
+  PostModel.aggregate(
+    [{ $match: { _id: ObjectId(req.params.postId) } }],
+    (err, data) => {
+      if (err) {
+        console.log(err);
+        res
+          .status(500)
+          .json({ status: "fail", data: "there was a server side error" });
+      } else {
+        if (data && data.length > 0) {
+          res.json({ status: "success", data });
+        } else {
+          res.status(404).json({ status: "fail", data: "post not found" });
+        }
+      }
+    },
+  );
 };
 
 //updatePost
-exports.updatePost = async (req, res) => {
-  try {
-    const post = await Post.aggregate([
+exports.updatePost = (req, res) => {
+  PostModel.aggregate(
+    [
       {
-        $match: { _id: ObjectId(req.params.postId), user: ObjectId(req.id) },
+        $match: {
+          user: req.userName,
+          _id: ObjectId(req.params.postId),
+        },
       },
-    ]);
-
-    if (post && post.length > 0) {
-      await Post.updateOne({ _id: req.params.postId }, req.body, { new: true });
-      res.json({ status: "success", data: "post update success" });
-    } else {
-      res.status(404).json({ status: "fail", data: "post not found" });
-    }
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ status: "fail", data: error });
-  }
+    ],
+    (err, data) => {
+      if (err) {
+        console.log(err);
+        res
+          .status(500)
+          .json({ status: "fail", data: "there was a server side error" });
+      } else {
+        if (data && data.length > 0) {
+          PostModel.updateOne(
+            { _id: req.params.postId, user: req.userName },
+            { ...req.body },
+            { new: true },
+            (err, result) => {
+              if (err) {
+                console.log(err);
+                res.status(500).json({
+                  status: "fail",
+                  data: "there was a server side error",
+                });
+              } else {
+                res.json({ status: "success", data: result });
+              }
+            },
+          );
+        } else {
+          res.status(404).json({ status: "fail", data: "post not found" });
+        }
+      }
+    },
+  );
 };
 
 //deletePost
-exports.deletePost = async (req, res) => {
-  try {
-    const post = await Post.aggregate([
+exports.deletePost = (req, res) => {
+  PostModel.aggregate(
+    [
       {
-        $match: { _id: ObjectId(req.params.postId), user: ObjectId(req.id) },
+        $match: {
+          user: req.userName,
+          _id: ObjectId(req.params.postId),
+        },
       },
-    ]);
-
-    if (post && post.length > 0) {
-      await Post.updateOne({ _id: req.params.postId });
-      res.json({ status: "success", data: "post detele success" });
-    } else {
-      res.status(404).json({ status: "fail", data: "post not found" });
-    }
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ status: "fail", data: error });
-  }
+    ],
+    (err, data) => {
+      if (err) {
+        console.log(err);
+        res
+          .status(500)
+          .json({ status: "fail", data: "there was a server side error" });
+      } else {
+        if (data && data.length > 0) {
+          PostModel.deleteOne({ _id: req.params.postId }, (err, result) => {
+            if (err) {
+              console.log(err);
+              res.status(500).json({
+                status: "fail",
+                data: "there was a server side error",
+              });
+            } else {
+              res.json({ status: "success", data: result });
+            }
+          });
+        } else {
+          res.status(404).json({ status: "fail", data: "post not found" });
+        }
+      }
+    },
+  );
 };
 
 //selectAllPost
-exports.selectAllPost = async (req, res) => {
-  const category = req.query.category;
-  const tag = req.query.tag;
-  const userId = req.query.user;
+exports.selectAllPost = (req, res) => {
+  const { user } = req.query;
+  const { category } = req.query;
+  const { tag } = req.query;
 
-  try {
-    if (category) {
-      const post = await Post.aggregate([
-        {
-          $match: { categories: { $in: [category] }, user: req.userName },
-        },
-      ]);
-      if (post && post.length > 0) {
-        res.json({ status: "success", data: post });
-      } else {
-        res.status(404).json({ status: "fail", data: "post not found" });
-      }
-    } else if (tag) {
-      const post = await Post.aggregate([
-        {
-          $match: { tags: { $in: [tag] }, user: req.userName },
-        },
-      ]);
-      if (post && post.length > 0) {
-        res.json({ status: "success", data: post });
-      } else {
-        res.status(404).json({ status: "fail", data: "post not found" });
-      }
-    } else if (userId) {
-      const post = await Post.aggregate([
-        {
-          $match: { user: userId },
-        },
-      ]);
-      if (post && post.length > 0) {
-        res.json({ status: "success", data: post });
-      } else {
-        res.status(404).json({ status: "fail", data: "post not found" });
-      }
+  PostModel.find({}, (err, data) => {
+    if (err) {
+      console.log(err);
+      res.status(500).json({
+        status: "fail",
+        data: "there was a server side error",
+      });
     } else {
-      const post = await Post.find({});
-      if (post && post.length > 0) {
-        res.json({ status: "success", data: post });
+      if (data && data.length > 0) {
+        if (user) {
+          PostModel.aggregate([{ $match: { user } }], (err, data) => {
+            if (err) {
+              console.log(err);
+              res.status(500).json({
+                status: "fail",
+                data: "there was a server side error",
+              });
+            } else {
+              if (data && data.length > 0) {
+                res.json({
+                  status: "success",
+                  data,
+                });
+              } else {
+                res
+                  .status(404)
+                  .json({ status: "fail", data: "post not found" });
+              }
+            }
+          });
+        } else if (category) {
+          PostModel.aggregate(
+            [{ $match: { category: { $in: [category] } } }],
+            (err, data) => {
+              if (err) {
+                console.log(err);
+                res.status(500).json({
+                  status: "fail",
+                  data: "there was a server side error",
+                });
+              } else {
+                if (data && data.length > 0) {
+                  res.json({
+                    status: "success",
+                    data,
+                  });
+                } else {
+                  res
+                    .status(404)
+                    .json({ status: "fail", data: "post not found" });
+                }
+              }
+            },
+          );
+        } else if (tag) {
+          PostModel.aggregate(
+            [{ $match: { tag: { $in: [tag] } } }],
+            (err, data) => {
+              if (err) {
+                console.log(err);
+                res.status(500).json({
+                  status: "fail",
+                  data: "there was a server side error",
+                });
+              } else {
+                if (data && data.length > 0) {
+                  res.json({
+                    status: "success",
+                    data,
+                  });
+                } else {
+                  res
+                    .status(404)
+                    .json({ status: "fail", data: "post not found" });
+                }
+              }
+            },
+          );
+        } else {
+          PostModel.find({}, (err, data) => {
+            if (data && data.length > 0) {
+              res.json({
+                status: "success",
+                data,
+              });
+            } else {
+              res.status(404).json({ status: "fail", data: "post not found" });
+            }
+          });
+        }
       } else {
-        res.status(404).json({ status: "fail", data: "post not found" });
+        res.status(404).json({
+          status: "fail",
+          data: "post not found",
+        });
       }
     }
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ status: "fail", data: error });
-  }
+  });
 };

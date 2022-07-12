@@ -1,107 +1,144 @@
 //external lib import
-const ObjectId = require("mongodb").ObjectID;
+const mongoose = require("mongoose");
+const ObjectId = mongoose.Types.ObjectId;
 
 //internal lib import
-const Tag = require("../model/Tag");
+const TagModel = require("../model/TagModel");
 
 //createTag
-exports.createTag = async (req, res) => {
-  try {
-    const newTag = new Tag({ ...req.body, user: req.userName });
-    await newTag.save();
-    res.status(201).json({ status: "success", data: "Tag create successful" });
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ status: "fail", data: error });
-  }
+exports.createTag = (req, res) => {
+  TagModel.create({ ...req.body, user: req.userName }, (err, data) => {
+    if (err) {
+      console.log(err);
+      res
+        .status(500)
+        .json({ status: "fail", data: "there was a server side error" });
+    } else {
+      res.status(201).json({ status: "success", data });
+    }
+  });
 };
 
 //selectTag
-exports.selectTag = async (req, res) => {
-  console.log(req.params.tagId);
-
-  try {
-    const tag = await Tag.aggregate([
-      {
-        $match: {
-          _id: ObjectId(req.params.tagId),
-          user: req.userName,
-        },
-      },
-    ]);
-
-    if (tag && tag.length > 0) {
-      res.json({ status: "success", data: tag });
-    } else {
-      res.status(404).json({ status: "fail", data: "Tag not found" });
-    }
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ status: "fail", data: error });
-  }
+exports.selectTag = (req, res) => {
+  TagModel.aggregate(
+    [{ $match: { _id: ObjectId(req.params.tagId) } }],
+    (err, data) => {
+      if (err) {
+        console.log(err);
+        res
+          .status(500)
+          .json({ status: "fail", data: "there was a server side error" });
+      } else {
+        if (data && data.length > 0) {
+          res.json({ status: "success", data });
+        } else {
+          res.status(404).json({ status: "fail", data: "post not found" });
+        }
+      }
+    },
+  );
 };
 
 //updateTag
-exports.updateTag = async (req, res) => {
-  try {
-    const tag = await Tag.aggregate([
+exports.updateTag = (req, res) => {
+  TagModel.aggregate(
+    [
       {
         $match: {
-          _id: ObjectId(req.params.tagId),
           user: req.userName,
+          _id: ObjectId(req.params.tagId),
         },
       },
-    ]);
-
-    if (tag && tag.length > 0) {
-      await Tag.updateOne({ _id: req.params.tagId }, req.body, {
-        new: true,
-      });
-      res.json({ status: "success", data: "Tag update success" });
-    } else {
-      res.status(404).json({ status: "fail", data: "Tag not found" });
-    }
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ status: "fail", data: error });
-  }
+    ],
+    (err, data) => {
+      if (err) {
+        console.log(err);
+        res
+          .status(500)
+          .json({ status: "fail", data: "there was a server side error" });
+      } else {
+        if (data && data.length > 0) {
+          TagModel.updateOne(
+            { _id: req.params.tagId, user: req.userName },
+            { ...req.body },
+            { new: true },
+            (err, result) => {
+              if (err) {
+                console.log(err);
+                res.status(500).json({
+                  status: "fail",
+                  data: "there was a server side error",
+                });
+              } else {
+                res.json({ status: "success", data: result });
+              }
+            },
+          );
+        } else {
+          res.status(404).json({ status: "fail", data: "post not found" });
+        }
+      }
+    },
+  );
 };
 
 //deleteTag
-exports.deleteTag = async (req, res) => {
-  try {
-    const tag = await Tag.aggregate([
+exports.deleteTag = (req, res) => {
+  TagModel.aggregate(
+    [
       {
         $match: {
-          _id: ObjectId(req.params.tagId),
           user: req.userName,
+          _id: ObjectId(req.params.tagId),
         },
       },
-    ]);
-
-    if (tag && tag.length > 0) {
-      await Tag.deleteOne({ _id: req.params.tagId });
-      res.json({ status: "success", data: "Tag detele success" });
-    } else {
-      res.status(404).json({ status: "fail", data: "Tag not found" });
-    }
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ status: "fail", data: error });
-  }
+    ],
+    (err, data) => {
+      if (err) {
+        console.log(err);
+        res
+          .status(500)
+          .json({ status: "fail", data: "there was a server side error" });
+      } else {
+        if (data && data.length > 0) {
+          TagModel.deleteOne({ _id: req.params.tagId }, (err, result) => {
+            if (err) {
+              console.log(err);
+              res.status(500).json({
+                status: "fail",
+                data: "there was a server side error",
+              });
+            } else {
+              res.json({ status: "success", data: result });
+            }
+          });
+        } else {
+          res.status(404).json({ status: "fail", data: "post not found" });
+        }
+      }
+    },
+  );
 };
 
 //selectAllTag
-exports.selectAllTag = async (req, res) => {
-  try {
-    const tag = await Tag.find({});
-    if (tag && tag.length > 0) {
-      res.json({ status: "success", data: tag });
+exports.selectAllTag = (req, res) => {
+  TagModel.find({}, (err, data) => {
+    if (err) {
+      console.log(err);
+      res.status(500).json({
+        status: "fail",
+        data: "there was a server side error",
+      });
     } else {
-      res.status(404).json({ status: "fail", data: "Tag not found" });
+      if (data && data.length > 0) {
+        res.json({
+          status: "success",
+          data,
+        });
+      } else {
+        res.status(404).json({ status: "fail", data: "tag not found" });
+      }
     }
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ status: "fail", data: error });
-  }
+  });
 };

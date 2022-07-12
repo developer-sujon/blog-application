@@ -2,6 +2,7 @@
 const express = require("express");
 const morgan = require("morgan");
 const dotenv = require("dotenv");
+const multer = require("multer");
 const path = require("path");
 const app = new express();
 
@@ -15,6 +16,7 @@ const { checkLogin } = require("./src/middleware/authVerify");
 const userRoutes = require("./src/routes/userRoutes");
 const postRoutes = require("./src/routes/postRoutes");
 const categoryRoutes = require("./src/routes/categoryRoutes");
+const tagRoutes = require("./src/routes/tagRoutes");
 
 //security lib imports
 const cors = require("cors");
@@ -23,7 +25,6 @@ const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
 const expressMongoSanitize = require("express-mongo-sanitize");
 const xssClean = require("xss-clean");
-const tagRoutes = require("./src/routes/tagRoutes");
 
 //security middleware emplement
 app.use(cors());
@@ -60,30 +61,35 @@ const DB_OPTIONS = {
 connectDB(MONGODB_CONNECTION_URL, DB_OPTIONS);
 app.use(express.static("client/build"));
 
-// Routing Implement
+const upload = multer({ dest: "uploads/" }).single("demo_image");
 
+app.post("/api/v1/upload", (req, res) => {
+  upload(req, res, (err) => {
+    if (err) {
+      res.status(400).send("Something went wrong!");
+    }
+    res.send(req.file);
+  });
+});
+
+// Routing Implement
 app.use("/api/v1/user", userRoutes);
 app.use("/api/v1/post", postRoutes);
 app.use("/api/v1/category", categoryRoutes);
 app.use("/api/v1/tag", tagRoutes);
 
+app.use("/images", express.static(path.join(__dirname, "/uploads")));
+
 // Add React Front End Routing
 app.get("*", (req, res) => {
-  res.sendFile(path.resolve(__dirname, "client", "build", "index.html"));
+  res.sendFile(path.resolve(__dirname, "client", "build", "uploads"));
 });
-
-// 404 not found handler
-// app.use(notFoundErrorHandler);
 
 // Default Error Handler
 app.use((err, req, res, next) => {
-  if (err.message) {
-    res.status(500).send({ status: "fail", data: err.message });
-  } else {
-    res
-      .status(500)
-      .send({ status: "fail", data: "There was an server side error!" });
-  }
+  const message = err.message ? err.message : "There was an server side error!";
+  const status = err.status ? err.status : 500;
+  res.status(status).send({ message });
 });
 
 module.exports = app;

@@ -1,109 +1,146 @@
 //external lib import
-const ObjectId = require("mongodb").ObjectID;
+const mongoose = require("mongoose");
+const ObjectId = mongoose.Types.ObjectId;
 
 //internal lib import
-const Category = require("../model/Category");
+const CategoryModel = require("../model/CategoryModel");
 
 //createCategory
-exports.createCategory = async (req, res) => {
-  try {
-    const newCategory = new Category({ ...req.body, user: req.userName });
-    await newCategory.save();
-    res
-      .status(201)
-      .json({ status: "success", data: "Category create successful" });
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ status: "fail", data: error });
-  }
+exports.createCategory = (req, res) => {
+  CategoryModel.create({ ...req.body, user: req.userName }, (err, data) => {
+    if (err) {
+      console.log(err);
+      res
+        .status(500)
+        .json({ status: "fail", data: "there was a server side error" });
+    } else {
+      res.status(201).json({ status: "success", data });
+    }
+  });
 };
 
 //selectCategory
-exports.selectCategory = async (req, res) => {
-  console.log(req.params.categoryId);
-
-  try {
-    const category = await Category.aggregate([
-      {
-        $match: {
-          _id: ObjectId(req.params.categoryId),
-          user: req.userName,
-        },
-      },
-    ]);
-
-    if (category && category.length > 0) {
-      res.json({ status: "success", data: category });
-    } else {
-      res.status(404).json({ status: "fail", data: "Category not found" });
-    }
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ status: "fail", data: error });
-  }
+exports.selectCategory = (req, res) => {
+  CategoryModel.aggregate(
+    [{ $match: { _id: ObjectId(req.params.tagId) } }],
+    (err, data) => {
+      if (err) {
+        console.log(err);
+        res
+          .status(500)
+          .json({ status: "fail", data: "there was a server side error" });
+      } else {
+        if (data && data.length > 0) {
+          res.json({ status: "success", data });
+        } else {
+          res.status(404).json({ status: "fail", data: "post not found" });
+        }
+      }
+    },
+  );
 };
 
 //updateCategory
-exports.updateCategory = async (req, res) => {
-  try {
-    const category = await Category.aggregate([
+exports.updateCategory = (req, res) => {
+  console.log(req.params.tagId);
+
+  CategoryModel.aggregate(
+    [
       {
         $match: {
-          _id: ObjectId(req.params.categoryId),
           user: req.userName,
+          _id: ObjectId(req.params.tagId),
         },
       },
-    ]);
-
-    if (category && category.length > 0) {
-      await Category.updateOne({ _id: req.params.categoryId }, req.body, {
-        new: true,
-      });
-      res.json({ status: "success", data: "Category update success" });
-    } else {
-      res.status(404).json({ status: "fail", data: "Category not found" });
-    }
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ status: "fail", data: error });
-  }
+    ],
+    (err, data) => {
+      if (err) {
+        console.log(err);
+        res
+          .status(500)
+          .json({ status: "fail", data: "there was a server side error" });
+      } else {
+        if (data && data.length > 0) {
+          CategoryModel.updateOne(
+            { _id: req.params.tagId, user: req.userName },
+            { ...req.body },
+            { new: true },
+            (err, result) => {
+              if (err) {
+                console.log(err);
+                res.status(500).json({
+                  status: "fail",
+                  data: "there was a server side error",
+                });
+              } else {
+                res.json({ status: "success", data: result });
+              }
+            },
+          );
+        } else {
+          res.status(404).json({ status: "fail", data: "post not found" });
+        }
+      }
+    },
+  );
 };
 
 //deleteCategory
-exports.deleteCategory = async (req, res) => {
-  try {
-    const category = await Category.aggregate([
+exports.deleteCategory = (req, res) => {
+  CategoryModel.aggregate(
+    [
       {
         $match: {
-          _id: ObjectId(req.params.categoryId),
-          user: req.id,
+          user: req.userName,
+          _id: ObjectId(req.params.tagId),
         },
       },
-    ]);
-
-    if (category && category.length > 0) {
-      await Category.deleteOne({ _id: req.params.categoryId });
-      res.json({ status: "success", data: "Category detele success" });
-    } else {
-      res.status(404).json({ status: "fail", data: "Category not found" });
-    }
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ status: "fail", data: error });
-  }
+    ],
+    (err, data) => {
+      if (err) {
+        console.log(err);
+        res
+          .status(500)
+          .json({ status: "fail", data: "there was a server side error" });
+      } else {
+        if (data && data.length > 0) {
+          CategoryModel.deleteOne({ _id: req.params.tagId }, (err, result) => {
+            if (err) {
+              console.log(err);
+              res.status(500).json({
+                status: "fail",
+                data: "there was a server side error",
+              });
+            } else {
+              res.json({ status: "success", data: result });
+            }
+          });
+        } else {
+          res.status(404).json({ status: "fail", data: "post not found" });
+        }
+      }
+    },
+  );
 };
 
 //selectAllCategory
-exports.selectAllCategory = async (req, res) => {
-  try {
-    const category = await Category.find({});
-    if (category && category.length > 0) {
-      res.json({ status: "success", data: category });
+exports.selectAllCategory = (req, res) => {
+  CategoryModel.find({}, (err, data) => {
+    if (err) {
+      console.log(err);
+      res.status(500).json({
+        status: "fail",
+        data: "there was a server side error",
+      });
     } else {
-      res.status(404).json({ status: "fail", data: "Category not found" });
+      if (data && data.length > 0) {
+        res.json({
+          status: "success",
+          data,
+        });
+      } else {
+        res.status(404).json({ status: "fail", data: "tag not found" });
+      }
     }
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ status: "fail", data: error });
-  }
+  });
 };
