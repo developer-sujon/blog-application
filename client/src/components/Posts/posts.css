@@ -8,15 +8,3 @@
 .m-auto {
   margin: 0 auto;
 }
-
-.fixed {
-  position: absolute;
-  top: 0;
-  left: 0;
-  z-index: 99999999999999;
-  background: #fff;
-  width: 100%;
-  margin: auto;
-  height: 100vh;
-  text-align: center;
-}

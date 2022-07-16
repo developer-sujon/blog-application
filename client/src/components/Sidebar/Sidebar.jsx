@@ -43,8 +43,8 @@ const Sidebar = () => {
   const fetchingCategory = () => {
     dispatch({ type: "START_FETCHING" });
     ApiRequest.getRequest(`/category/selectAllCategory`)
-      .then((data) => {
-        dispatch({ type: "SUCCESS_FETCHING", data: data.data["data"] });
+      .then((response) => {
+        dispatch({ type: "SUCCESS_FETCHING", data: response.data });
       })
       .catch((err) => {
         console.log(err);
@@ -57,21 +57,16 @@ const Sidebar = () => {
   }, []);
 
   if (category.isFetching === true) {
-    return (
-      <div className="fixed">
-        <img src={Loading} alt="Loading" className="m-auto" />;
-      </div>
-    );
+    return <img src={Loading} alt="Loading" className="m-auto" />;
   } else if (category.isError === true) {
-    return (
-      <div className="fixed">
-        <img src={Failure} alt="Failure" className="m-auto" />;
-      </div>
-    );
+    return <img src={Failure} alt="Failure" className="m-auto" />;
   } else if (category.data.length <= 0) {
     return (
-      <div className="fixed">
-        <img src={Empty} alt="Empty" className="m-auto" />;
+      <div className="sidebarItem">
+        <span className="sidebarTitle">CATEGORIES</span>
+        <ul className="sidebarList">
+          <li className="sidebarListItem">Category Not Found</li>
+        </ul>
       </div>
     );
   } else {

@@ -45,8 +45,8 @@ const Posts = () => {
   const fetchingPost = () => {
     dispatch({ type: "START_FETCHING" });
     ApiRequest.getRequest(`/post/selectAllPost${search}`)
-      .then((data) => {
-        dispatch({ type: "SUCCESS_FETCHING", data: data.data["data"] });
+      .then((response) => {
+        dispatch({ type: "SUCCESS_FETCHING", data: response.data });
       })
       .catch((err) => {
         console.log(err);
@@ -59,23 +59,11 @@ const Posts = () => {
   }, [search]);
 
   if (posts.isFetching === true) {
-    return (
-      <div className="fixed">
-        <img src={Loading} alt="Loading" className="m-auto" />;
-      </div>
-    );
+    return <img src={Loading} alt="Loading" className="m-auto" />;
   } else if (posts.isError === true) {
-    return (
-      <div className="fixed">
-        <img src={Failure} alt="Failure" className="m-auto" />;
-      </div>
-    );
+    return <img src={Failure} alt="Failure" className="m-auto" />;
   } else if (posts.data.length <= 0) {
-    return (
-      <div className="fixed">
-        <img src={Empty} alt="Empty" className="m-auto" />;
-      </div>
-    );
+    return <img src={Empty} alt="Empty" className="m-auto" />;
   } else {
     return (
       <div className="posts">

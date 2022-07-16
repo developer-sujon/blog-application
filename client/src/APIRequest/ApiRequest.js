@@ -1,9 +1,9 @@
 //external lib import
 import axios from "axios";
 
-axios.defaults.baseURL = "http://localhost:5000/api/v1";
+axios.defaults.baseURL = "http://localhost:8080/api/v1";
 axios.defaults.headers.common["Authorization"] =
-  "Bearer " + sessionStorage.getItem("token");
+  "Bearer " + sessionStorage.getItem("accessToken");
 
 axios.defaults.headers.post["Content-Type"] =
   "application/x-www-form-urlencoded";
@@ -16,12 +16,12 @@ class ApiRequest {
         if (response.status === 200) {
           return response;
         } else {
-          return null;
+          return false;
         }
       })
       .catch((err) => {
         console.log(err);
-        return null;
+        return false;
       });
   }
 
@@ -29,15 +29,15 @@ class ApiRequest {
     return axios
       .post(url, postJson)
       .then((response) => {
-        if (response.status === 201 || response.status === 200) {
+        if (response.status === 201) {
           return response;
         } else {
-          return null;
+          return false;
         }
       })
       .catch((err) => {
         console.log(err);
-        return null;
+        return false;
       });
   }
 
@@ -48,12 +48,12 @@ class ApiRequest {
         if (response.status === 200) {
           return response;
         } else {
-          return null;
+          return false;
         }
       })
       .catch((err) => {
         console.log(err);
-        return null;
+        return false;
       });
   }
 
@@ -64,12 +64,12 @@ class ApiRequest {
         if (response.status === 200) {
           return response;
         } else {
-          return null;
+          return false;
         }
       })
       .catch((err) => {
         console.log(err);
-        return null;
+        return false;
       });
   }
 }

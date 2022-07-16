@@ -7,16 +7,12 @@ const PostModel = require("../model/PostModel");
 
 //createPost
 exports.createPost = (req, res) => {
-  console.log(req.userName);
-
   PostModel.create({ ...req.body, user: req.userName }, (err, data) => {
     if (err) {
       console.log(err);
-      res
-        .status(500)
-        .json({ status: "fail", data: "there was a server side error" });
+      res.status(500).json({ message: "there was a server side error" });
     } else {
-      res.status(201).json({ status: "success", data });
+      res.status(201).json(data);
     }
   });
 };
@@ -28,15 +24,9 @@ exports.selectPost = (req, res) => {
     (err, data) => {
       if (err) {
         console.log(err);
-        res
-          .status(500)
-          .json({ status: "fail", data: "there was a server side error" });
+        res.status(500).json({ message: "there was a server side error" });
       } else {
-        if (data && data.length > 0) {
-          res.json({ status: "success", data });
-        } else {
-          res.status(404).json({ status: "fail", data: "post not found" });
-        }
+        res.json(data);
       }
     },
   );
@@ -56,9 +46,7 @@ exports.updatePost = (req, res) => {
     (err, data) => {
       if (err) {
         console.log(err);
-        res
-          .status(500)
-          .json({ status: "fail", data: "there was a server side error" });
+        res.status(500).json({ message: "there was a server side error" });
       } else {
         if (data && data.length > 0) {
           PostModel.updateOne(
@@ -69,16 +57,15 @@ exports.updatePost = (req, res) => {
               if (err) {
                 console.log(err);
                 res.status(500).json({
-                  status: "fail",
-                  data: "there was a server side error",
+                  message: "there was a server side error",
                 });
               } else {
-                res.json({ status: "success", data: result });
+                res.json(result);
               }
             },
           );
         } else {
-          res.status(404).json({ status: "fail", data: "post not found" });
+          res.status(404).json({ message: "post not found" });
         }
       }
     },
@@ -99,24 +86,21 @@ exports.deletePost = (req, res) => {
     (err, data) => {
       if (err) {
         console.log(err);
-        res
-          .status(500)
-          .json({ status: "fail", data: "there was a server side error" });
+        res.status(500).json({ message: "there was a server side error" });
       } else {
         if (data && data.length > 0) {
           PostModel.deleteOne({ _id: req.params.postId }, (err, result) => {
             if (err) {
               console.log(err);
               res.status(500).json({
-                status: "fail",
-                data: "there was a server side error",
+                message: "there was a server side error",
               });
             } else {
-              res.json({ status: "success", data: result });
+              res.json(result);
             }
           });
         } else {
-          res.status(404).json({ status: "fail", data: "post not found" });
+          res.status(404).json({ message: "post not found" });
         }
       }
     },
@@ -133,8 +117,7 @@ exports.selectAllPost = (req, res) => {
     if (err) {
       console.log(err);
       res.status(500).json({
-        status: "fail",
-        data: "there was a server side error",
+        message: "there was a server side error",
       });
     } else {
       if (data && data.length > 0) {
@@ -143,19 +126,13 @@ exports.selectAllPost = (req, res) => {
             if (err) {
               console.log(err);
               res.status(500).json({
-                status: "fail",
-                data: "there was a server side error",
+                message: "there was a server side error",
               });
             } else {
               if (data && data.length > 0) {
-                res.json({
-                  status: "success",
-                  data,
-                });
+                res.json(data);
               } else {
-                res
-                  .status(404)
-                  .json({ status: "fail", data: "post not found" });
+                res.status(404).json({ message: "post not found" });
               }
             }
           });
@@ -166,19 +143,13 @@ exports.selectAllPost = (req, res) => {
               if (err) {
                 console.log(err);
                 res.status(500).json({
-                  status: "fail",
-                  data: "there was a server side error",
+                  message: "there was a server side error",
                 });
               } else {
                 if (data && data.length > 0) {
-                  res.json({
-                    status: "success",
-                    data,
-                  });
+                  res.json(data);
                 } else {
-                  res
-                    .status(404)
-                    .json({ status: "fail", data: "post not found" });
+                  res.status(404).json({ message: "post not found" });
                 }
               }
             },
@@ -189,20 +160,12 @@ exports.selectAllPost = (req, res) => {
             (err, data) => {
               if (err) {
                 console.log(err);
-                res.status(500).json({
-                  status: "fail",
-                  data: "there was a server side error",
-                });
+                res.status(500).json(data);
               } else {
                 if (data && data.length > 0) {
-                  res.json({
-                    status: "success",
-                    data,
-                  });
+                  res.json(data);
                 } else {
-                  res
-                    .status(404)
-                    .json({ status: "fail", data: "post not found" });
+                  res.status(404).json({ message: "post not found" });
                 }
               }
             },
@@ -210,19 +173,15 @@ exports.selectAllPost = (req, res) => {
         } else {
           PostModel.find({}, (err, data) => {
             if (data && data.length > 0) {
-              res.json({
-                status: "success",
-                data,
-              });
+              res.json(data);
             } else {
-              res.status(404).json({ status: "fail", data: "post not found" });
+              res.status(404).json({ message: "post not found" });
             }
           });
         }
       } else {
         res.status(404).json({
-          status: "fail",
-          data: "post not found",
+          message: "post not found",
         });
       }
     }

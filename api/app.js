@@ -53,7 +53,7 @@ const MONGODB_CONNECTION_URL = process.env.MONGODB_CONNECTION_URL;
 const DB_OPTIONS = {
   //user: process.env.MONGODB_DATABASE_USERNAME,
   //pass: process.env.MONGODB_DATABASE_PASSWORD,
-  dbName: "task",
+  dbName: "mern-blog",
   autoIndex: true,
 };
 

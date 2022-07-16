@@ -10,11 +10,9 @@ exports.createTag = (req, res) => {
   TagModel.create({ ...req.body, user: req.userName }, (err, data) => {
     if (err) {
       console.log(err);
-      res
-        .status(500)
-        .json({ status: "fail", data: "there was a server side error" });
+      res.status(500).json({ message: "there was a server side error" });
     } else {
-      res.status(201).json({ status: "success", data });
+      res.status(201).json(data);
     }
   });
 };
@@ -26,15 +24,9 @@ exports.selectTag = (req, res) => {
     (err, data) => {
       if (err) {
         console.log(err);
-        res
-          .status(500)
-          .json({ status: "fail", data: "there was a server side error" });
+        res.status(500).json({ message: "there was a server side error" });
       } else {
-        if (data && data.length > 0) {
-          res.json({ status: "success", data });
-        } else {
-          res.status(404).json({ status: "fail", data: "post not found" });
-        }
+        res.json(data);
       }
     },
   );
@@ -54,30 +46,23 @@ exports.updateTag = (req, res) => {
     (err, data) => {
       if (err) {
         console.log(err);
-        res
-          .status(500)
-          .json({ status: "fail", data: "there was a server side error" });
+        res.status(500).json({ message: "there was a server side error" });
       } else {
-        if (data && data.length > 0) {
-          TagModel.updateOne(
-            { _id: req.params.tagId, user: req.userName },
-            { ...req.body },
-            { new: true },
-            (err, result) => {
-              if (err) {
-                console.log(err);
-                res.status(500).json({
-                  status: "fail",
-                  data: "there was a server side error",
-                });
-              } else {
-                res.json({ status: "success", data: result });
-              }
-            },
-          );
-        } else {
-          res.status(404).json({ status: "fail", data: "post not found" });
-        }
+        TagModel.updateOne(
+          { _id: req.params.tagId, user: req.userName },
+          { ...req.body },
+          { new: true },
+          (err, result) => {
+            if (err) {
+              console.log(err);
+              res.status(500).json({
+                message: "there was a server side error",
+              });
+            } else {
+              res.json(result);
+            }
+          },
+        );
       }
     },
   );
@@ -97,25 +82,18 @@ exports.deleteTag = (req, res) => {
     (err, data) => {
       if (err) {
         console.log(err);
-        res
-          .status(500)
-          .json({ status: "fail", data: "there was a server side error" });
+        res.status(500).json({ message: "there was a server side error" });
       } else {
-        if (data && data.length > 0) {
-          TagModel.deleteOne({ _id: req.params.tagId }, (err, result) => {
-            if (err) {
-              console.log(err);
-              res.status(500).json({
-                status: "fail",
-                data: "there was a server side error",
-              });
-            } else {
-              res.json({ status: "success", data: result });
-            }
-          });
-        } else {
-          res.status(404).json({ status: "fail", data: "post not found" });
-        }
+        TagModel.deleteOne({ _id: req.params.tagId }, (err, result) => {
+          if (err) {
+            console.log(err);
+            res.status(500).json({
+              message: "there was a server side error",
+            });
+          } else {
+            res.json(result);
+          }
+        });
       }
     },
   );
@@ -127,18 +105,10 @@ exports.selectAllTag = (req, res) => {
     if (err) {
       console.log(err);
       res.status(500).json({
-        status: "fail",
-        data: "there was a server side error",
+        message: "there was a server side error",
       });
     } else {
-      if (data && data.length > 0) {
-        res.json({
-          status: "success",
-          data,
-        });
-      } else {
-        res.status(404).json({ status: "fail", data: "tag not found" });
-      }
+      res.json(data);
     }
   });
 };
