@@ -59,7 +59,9 @@ exports.updateCategory = (req, res) => {
                 message: "there was a server side error",
               });
             } else {
-              res.json(result);
+              res.json({
+                message: "category update successful",
+              });
             }
           },
         );
@@ -92,7 +94,9 @@ exports.deleteCategory = (req, res) => {
                 message: "there was a server side error",
               });
             } else {
-              res.json(result);
+              res.json({
+                message: "category delete successful",
+              });
             }
           });
         } else {

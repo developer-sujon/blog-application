@@ -59,7 +59,9 @@ exports.updateTag = (req, res) => {
                 message: "there was a server side error",
               });
             } else {
-              res.json(result);
+              res.json({
+                message: "tag update successful",
+              });
             }
           },
         );
@@ -91,7 +93,9 @@ exports.deleteTag = (req, res) => {
               message: "there was a server side error",
             });
           } else {
-            res.json(result);
+            res.json({
+              message: "tag delete successful",
+            });
           }
         });
       }

@@ -4,6 +4,7 @@ const morgan = require("morgan");
 const dotenv = require("dotenv");
 const multer = require("multer");
 const path = require("path");
+require("express-async-errors");
 const app = new express();
 
 dotenv.config({ path: path.join(__dirname, "./.env") });
@@ -87,6 +88,8 @@ app.get("*", (req, res) => {
 
 // Default Error Handler
 app.use((err, req, res, next) => {
+  console.log(err);
+
   const message = err.message ? err.message : "There was an server side error!";
   const status = err.status ? err.status : 500;
   res.status(status).send({ message });

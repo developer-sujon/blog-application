@@ -1,11 +1,12 @@
 import { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import ApiRequest from "../../APIRequest/ApiRequest";
+import FormValidation from "../../helper/FormValidation";
+import SessionHelper from "../../helper/SessionHelper";
 import ToastMessage from "../../helper/ToastMessage";
 import "./login.css";
 
 const LoginPage = () => {
-  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   let userName,
@@ -13,32 +14,26 @@ const LoginPage = () => {
 
   const loginUser = (e) => {
     e.preventDefault();
-    setLoading(true);
 
     const postJson = {
       userName: userName.value,
       password: password.value,
     };
 
-    ApiRequest.postRequest("/user/loginUser", postJson)
-      .then((response) => {
-        console.log(response);
-
-        if (response.status === 200) {
-          setLoading(false);
+    if (FormValidation.isEmpty(userName.value)) {
+      ToastMessage.errorMessage("Please Enter Your Your Username");
+    } else if (FormValidation.isEmpty(password.value)) {
+      ToastMessage.errorMessage("Please Enter Your Your Password");
+    } else {
+      ApiRequest.postRequest("/user/loginUser", postJson).then((response) => {
+        if (response) {
+          console.log(response);
           ToastMessage.successMessage("Login Successfull");
-          sessionStorage.setItem("token", response.data.token);
-          navigate("/");
+          SessionHelper.setToken(response.data.accessToken);
+          window.location.href = "/";
         }
-      })
-      .catch((err) => {
-        console.log(err);
-        setLoading(false);
-        ToastMessage.errorMessage("Login Failure");
       });
-
-    // userName.value = "";
-    // password.value = "";
+    }
   };
 
   return (

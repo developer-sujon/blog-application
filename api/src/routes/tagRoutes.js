@@ -2,7 +2,7 @@
 const tagRoutes = require("express").Router();
 
 //internal lib import
-const { checkLogin } = require("../middleware/authVerify");
+const checkLogin = require("../middleware/authVerify");
 const {
   createTag,
   selectTag,

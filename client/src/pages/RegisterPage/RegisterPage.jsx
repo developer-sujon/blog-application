@@ -1,12 +1,13 @@
-import { useState } from "react";
 import { useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 import ApiRequest from "../../APIRequest/ApiRequest";
 import ToastMessage from "../../helper/ToastMessage";
 import "./register.css";
 
 const RegisterPage = () => {
-  const [loading, setLoading] = useState(false);
+  const loder = useSelector((state) => state.setting.isLoading);
+
   const navigate = useNavigate();
 
   let userName,
@@ -16,7 +17,6 @@ const RegisterPage = () => {
 
   const registrationUser = (e) => {
     e.preventDefault();
-    setLoading(true);
 
     const postJson = {
       userName: userName.value,
@@ -25,23 +25,16 @@ const RegisterPage = () => {
       password: password.value,
     };
 
-    ApiRequest.postRequest("/user/registrationUser", postJson)
-      .then((response) => {
-        if (response.status === 201) {
-          setLoading(false);
+    ApiRequest.postRequest("/user/registrationUser", postJson).then(
+      (result) => {
+        if (result) {
           ToastMessage.successMessage("User Registration Successfull");
           navigate("/login");
+        } else {
+          ToastMessage.errorMessage("User Registration Failure");
         }
-      })
-      .catch((err) => {
-        setLoading(false);
-        ToastMessage.errorMessage("User Registration Failure");
-      });
-
-    userName.value = "";
-    email.value = "";
-    phone.value = "";
-    password.value = "";
+      },
+    );
   };
 
   return (
@@ -76,8 +69,8 @@ const RegisterPage = () => {
           type="password"
           placeholder="Enter your password..."
         />
-        <button className="registerButton" disabled={loading}>
-          {loading ? "Register .." : "Register"}
+        <button className="registerButton" disabled={loder}>
+          {loder ? "Register .." : "Register"}
         </button>
       </form>
       <button className="registerLoginButton">Login</button>

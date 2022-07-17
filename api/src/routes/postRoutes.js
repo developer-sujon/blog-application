@@ -1,7 +1,7 @@
 //external lib import
 const postRoutes = require("express").Router();
 
-const { checkLogin } = require("../middleware/authVerify");
+const checkLogin = require("../middleware/authVerify");
 const {
   selectPost,
   updatePost,

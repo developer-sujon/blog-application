@@ -1,18 +1,21 @@
-import React from "react";
+import { Suspense, lazy } from "react";
+import LazyLoader from "../../components/MasterLayout/LazyLoader";
 
-import Header from "../../components/Header/Header";
-import Posts from "../../components/Posts/Posts";
-import Sidebar from "../../components/Sidebar/Sidebar";
+const Header = lazy(() => import("../../components/Header/Header"));
+const Posts = lazy(() => import("../../components/Posts/Posts"));
+const Sidebar = lazy(() => import("../../components/Sidebar/Sidebar"));
 
 const HomePage = () => {
   return (
-    <>
+    <Suspense fallback={LazyLoader}>
       <Header />
-      <div className="row">
-        <Posts />
-        <Sidebar />
+      <div className="container p-5">
+        <div className="row">
+          <Posts />
+          <Sidebar />
+        </div>
       </div>
-    </>
+    </Suspense>
   );
 };
 

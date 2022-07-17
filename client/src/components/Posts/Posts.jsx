@@ -1,73 +1,71 @@
-import { useEffect, useReducer } from "react";
+import { useEffect } from "react";
+import { Link, useLocation } from "react-router-dom";
+import { useSelector } from "react-redux";
 import ApiRequest from "../../APIRequest/ApiRequest";
-import Post from "../Post/Post";
-import Loading from "../../assets/images/loding.svg";
-import Failure from "../../assets/images/failure.png";
-import Empty from "../../assets/images/empty.png";
-import "./posts.css";
-import { useLocation } from "react-router-dom";
-
-const initialState = {
-  isFetching: true,
-  isError: false,
-  data: [],
-};
-
-const reducer = (state, action) => {
-  switch (action.type) {
-    case "START_FETCHING":
-      return {
-        isFetching: true,
-        isError: false,
-        data: [],
-      };
-    case "SUCCESS_FETCHING":
-      return {
-        isFetching: false,
-        isError: false,
-        data: action.data,
-      };
-    case "FAILURE_FETCHING":
-      return {
-        isFetching: false,
-        isError: true,
-        data: [],
-      };
-    default:
-      return state;
-  }
-};
+import { setPost } from "../../redux/features/postsSlice";
+import store from "../../redux/store/store";
 
 const Posts = () => {
-  const [posts, dispatch] = useReducer(reducer, initialState);
   const { search } = useLocation();
 
-  const fetchingPost = () => {
-    dispatch({ type: "START_FETCHING" });
-    ApiRequest.getRequest(`/post/selectAllPost${search}`)
-      .then((response) => {
-        dispatch({ type: "SUCCESS_FETCHING", data: response.data });
-      })
-      .catch((err) => {
-        console.log(err);
-        dispatch({ type: "FAILURE_FETCHING" });
-      });
-  };
+  const posts = useSelector((state) => state.posts.value);
 
   useEffect(() => {
-    fetchingPost();
+    ApiRequest.getRequest("/post/selectAllPost" + search).then((response) => {
+      store.dispatch(setPost(response.data));
+    });
   }, [search]);
 
-  if (posts.isFetching === true) {
-    return <img src={Loading} alt="Loading" className="m-auto" />;
-  } else if (posts.isError === true) {
-    return <img src={Failure} alt="Failure" className="m-auto" />;
-  } else if (posts.data.length <= 0) {
-    return <img src={Empty} alt="Empty" className="m-auto" />;
+  if (posts.length < 0) {
+    return "no post here";
   } else {
     return (
-      <div className="posts">
-        {posts.data && posts.data.map((p) => <Post {...p} key={p._id} />)}
+      <div className="posts col-md-8 px-5">
+        <div className="row">
+          {posts.map(
+            ({
+              _id,
+              title,
+              body,
+              photo,
+              categories,
+              tags,
+              user,
+              createdAt,
+              img,
+            }) => {
+              return (
+                <div className="post col-md-6">
+                  <img className="postImg" src={photo} alt="" />
+                  <div className="postInfo">
+                    <div className="postCats">
+                      {categories &&
+                        categories.map((cat) => {
+                          return (
+                            <span className="postCat">
+                              <Link className="link" to="/posts?cat=Music">
+                                Music
+                              </Link>
+                            </span>
+                          );
+                        })}
+                    </div>
+                    <span className="postTitle">
+                      <Link to={`/post/${_id}`} className="link">
+                        {title}
+                      </Link>
+                    </span>
+                    <hr />
+                    <span className="postDate">
+                      {new Date(createdAt).toDateString()}
+                    </span>
+                  </div>
+                  <p className="postDesc">{body}</p>
+                </div>
+              );
+            },
+          )}
+        </div>
       </div>
     );
   }

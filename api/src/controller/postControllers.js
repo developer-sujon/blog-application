@@ -20,7 +20,17 @@ exports.createPost = (req, res) => {
 //selectPost
 exports.selectPost = (req, res) => {
   PostModel.aggregate(
-    [{ $match: { _id: ObjectId(req.params.postId) } }],
+    [
+      { $match: { _id: ObjectId(req.params.postId) } },
+      {
+        $lookup: {
+          from: "categories",
+          localField: "categories",
+          foreignField: "_id",
+          as: "categories",
+        },
+      },
+    ],
     (err, data) => {
       if (err) {
         console.log(err);
@@ -60,7 +70,7 @@ exports.updatePost = (req, res) => {
                   message: "there was a server side error",
                 });
               } else {
-                res.json(result);
+                res.json({ message: "post update successful" });
               }
             },
           );
@@ -96,7 +106,7 @@ exports.deletePost = (req, res) => {
                 message: "there was a server side error",
               });
             } else {
-              res.json(result);
+              res.json({ message: "post delete successful" });
             }
           });
         } else {
@@ -122,23 +132,18 @@ exports.selectAllPost = (req, res) => {
     } else {
       if (data && data.length > 0) {
         if (user) {
-          PostModel.aggregate([{ $match: { user } }], (err, data) => {
-            if (err) {
-              console.log(err);
-              res.status(500).json({
-                message: "there was a server side error",
-              });
-            } else {
-              if (data && data.length > 0) {
-                res.json(data);
-              } else {
-                res.status(404).json({ message: "post not found" });
-              }
-            }
-          });
-        } else if (category) {
           PostModel.aggregate(
-            [{ $match: { category: { $in: [category] } } }],
+            [
+              { $match: { user } },
+              {
+                $lookup: {
+                  from: "categories",
+                  localField: "categories",
+                  foreignField: "_id",
+                  as: "categories",
+                },
+              },
+            ],
             (err, data) => {
               if (err) {
                 console.log(err);
@@ -146,38 +151,77 @@ exports.selectAllPost = (req, res) => {
                   message: "there was a server side error",
                 });
               } else {
-                if (data && data.length > 0) {
-                  res.json(data);
-                } else {
-                  res.status(404).json({ message: "post not found" });
-                }
+                res.json(data);
+              }
+            },
+          );
+        } else if (category) {
+          PostModel.aggregate(
+            [
+              { $match: { category: { $in: [category] } } },
+              {
+                $lookup: {
+                  from: "categories",
+                  localField: "categories",
+                  foreignField: "_id",
+                  as: "categories",
+                },
+              },
+            ],
+            (err, data) => {
+              if (err) {
+                console.log(err);
+                res.status(500).json({
+                  message: "there was a server side error",
+                });
+              } else {
+                res.json(data);
               }
             },
           );
         } else if (tag) {
           PostModel.aggregate(
-            [{ $match: { tag: { $in: [tag] } } }],
+            [
+              { $match: { tag: { $in: [tag] } } },
+              {
+                $lookup: {
+                  from: "categories",
+                  localField: "categories",
+                  foreignField: "_id",
+                  as: "categories",
+                },
+              },
+            ],
             (err, data) => {
               if (err) {
                 console.log(err);
                 res.status(500).json(data);
               } else {
-                if (data && data.length > 0) {
-                  res.json(data);
-                } else {
-                  res.status(404).json({ message: "post not found" });
-                }
+                res.json(data);
               }
             },
           );
         } else {
-          PostModel.find({}, (err, data) => {
-            if (data && data.length > 0) {
-              res.json(data);
-            } else {
-              res.status(404).json({ message: "post not found" });
-            }
-          });
+          PostModel.aggregate(
+            [
+              {
+                $lookup: {
+                  from: "categories",
+                  localField: "categories",
+                  foreignField: "_id",
+                  as: "categories",
+                },
+              },
+            ],
+            (err, data) => {
+              if (err) {
+                console.log(err);
+                res.status(500).json(data);
+              } else {
+                res.json(data);
+              }
+            },
+          );
         }
       } else {
         res.status(404).json({

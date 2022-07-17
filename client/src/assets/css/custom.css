@@ -1,0 +1,23 @@
+.LoadingOverlay {
+  position: absolute;
+  display: block;
+  height: 100%;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  cursor: pointer;
+  z-index: 500000 !important;
+  background-color: rgba(255, 255, 255, 0.6);
+}
+
+.overLayImg {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+img {
+  max-width: 100%;
+}

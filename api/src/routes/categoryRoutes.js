@@ -2,7 +2,7 @@
 const categoryRoutes = require("express").Router();
 
 //internal lib import
-const { checkLogin } = require("../middleware/authVerify");
+const checkLogin = require("../middleware/authVerify");
 const {
   createCategory,
   selectCategory,

@@ -19,10 +19,20 @@ const postScheme = Schema(
     },
     photo: {
       type: String,
-      default: "",
+      default: "https://www.allbusiness.com/asset/2017/12/Blog-concept.jpg",
     },
-    categories: Array,
-    tags: Array,
+    categories: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Category",
+      },
+    ],
+    tags: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Tag",
+      },
+    ],
     user: {
       type: String,
       required: true,

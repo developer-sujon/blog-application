@@ -1,8 +1,10 @@
 import { Link } from "react-router-dom";
+import SessionHelper from "../../helper/SessionHelper";
 import "./topbar.css";
 
 const Topbar = () => {
-  const user = true;
+  const accessToken = SessionHelper.getToken() ?? null;
+
   return (
     <div className="top">
       <div className="topLeft">
@@ -23,11 +25,11 @@ const Topbar = () => {
               WRITE
             </Link>
           </li>
-          {user && <li className="topListItem">LOGOUT</li>}
+          {accessToken && <li className="topListItem">LOGOUT</li>}
         </ul>
       </div>
       <div className="topRight">
-        {user ? (
+        {accessToken ? (
           <Link className="link" to="/settings">
             <img
               className="topImg"

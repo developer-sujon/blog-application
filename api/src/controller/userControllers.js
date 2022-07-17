@@ -17,16 +17,12 @@ exports.registrationUser = (req, res) => {
     (err, data) => {
       if (err) {
         console.log(err);
-        res
-          .status(500)
-          .json({ status: "fail", data: "there was a server side error" });
+        res.status(500).json({ message: "there was a server side error" });
       } else {
         if (data && data.length > 0) {
           console.log(data);
 
-          res
-            .status(400)
-            .json({ status: "fail", data: "user already registered" });
+          res.status(409).json({ message: "user already registered" });
         } else {
           bcrypt.hash(password, 10, (err, hashPassword) => {
             UserModel.create(
@@ -35,13 +31,11 @@ exports.registrationUser = (req, res) => {
                 if (err) {
                   console.log(err);
                   res.status(500).json({
-                    status: "fail",
-                    data: "there was a server side error",
+                    message: "there was a server side error",
                   });
                 } else {
                   res.status(201).json({
-                    status: "success",
-                    data: "user  registered successfull",
+                    message: "user  registered successfull",
                   });
                 }
               },
@@ -66,30 +60,27 @@ exports.loginUser = (req, res) => {
     (err, data) => {
       if (err) {
         console.log(err);
-        res
-          .status(500)
-          .json({ status: "fail", data: "there was a server side error" });
+        res.status(500).json({ message: "there was a server side error" });
       } else {
         if (data && data.length > 0) {
           bcrypt.compare(password, data[0].password, (err, result) => {
             if (result) {
               const payload = {
                 exp: Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 7,
-                data: {
-                  userName: data[0].userName,
-                  id: data[0]._id,
-                },
+                userName: data[0].userName,
+                id: data[0]._id,
               };
-
               const token = jwt.sign(payload, process.env.JWT_SECRET_KEY);
 
-              res.json({ status: "success", token });
+              delete data[0].password;
+
+              res.json({ accessToken: token, user: data[0] });
             } else {
-              res.status(401).json({ token: "unauthorized credential" });
+              res.status(401).json({ message: "unauthorized credential" });
             }
           });
         } else {
-          res.status(404).json({ status: "fail", data: "user not found" });
+          res.status(404).json({ message: "user not found" });
         }
       }
     },
@@ -98,131 +89,89 @@ exports.loginUser = (req, res) => {
 
 //selectUser
 exports.selectUser = (req, res) => {
-  const { userName, ...others } = req.body;
-
-  if (req.userName) {
-    UserModel.aggregate(
-      [
-        {
-          $match: { userName: req.userName },
-        },
-      ],
-      (err, data) => {
-        if (err) {
-          console.log(err);
-          res
-            .status(500)
-            .json({ status: "fail", data: "there was a server side error" });
-        } else {
-          if (data && data.length > 0) {
-            res.json(data);
-          } else {
-            res.status(404).json({ status: "fail", data: "user not found" });
-          }
-        }
+  const { userName } = req.params;
+  UserModel.aggregate(
+    [
+      {
+        $match: { userName: userName },
       },
-    );
-  } else {
-    res.status(401).json({ status: "fail", data: "unauthorized credential" });
-  }
+    ],
+    (err, data) => {
+      if (err) {
+        console.log(err);
+        res.status(500).json({ data: "there was a server side error" });
+      } else {
+        if (data && data.length > 0) {
+          delete data[0].password;
+          res.json(data);
+        } else {
+          res.status(404).json({ message: "user not found" });
+        }
+      }
+    },
+  );
 };
 
 //updateUser
 exports.updateUser = (req, res) => {
-  const { userName, ...others } = req.body;
+  const { name, phone, photo } = req.body;
+  const { userName } = req.params;
 
-  if (req.userName) {
+  console.log(userName);
+
+  if (userName === req.userName) {
     UserModel.aggregate(
       [
         {
-          $match: { userName: req.userName },
+          $match: { userName: userName },
         },
       ],
       (err, data) => {
         if (err) {
           console.log(err);
-          res
-            .status(500)
-            .json({ status: "fail", data: "there was a server side error" });
+          res.status(500).json({ message: "there was a server side error" });
         } else {
-          if (data && data.length > 0) {
-            bcrypt.hash(req.body.password, 10, (err, hashPassword) => {
+          UserModel.updateOne(
+            { userName: userName },
+            { name, phone, photo },
+            { new: true },
+            (err, data) => {
               if (err) {
                 console.log(err);
                 res.status(500).json({
-                  status: "fail",
-                  data: "there was a server side error",
+                  message: "there was a server side error",
                 });
               } else {
-                UserModel.updateOne(
-                  { userName: req.userName },
-                  { others, password: hashPassword },
-                  { new: true },
-                  (err, data) => {
-                    if (err) {
-                      console.log(err);
-                      res.status(500).json({
-                        status: "fail",
-                        data: "there was a server side error",
-                      });
-                    } else {
-                      res.json({ data });
-                    }
-                  },
-                );
+                res.json({ message: "user update successful" });
               }
-            });
-          } else {
-            res.status(404).json({ status: "fail", data: "user not found" });
-          }
+            },
+          );
         }
       },
     );
   } else {
-    res.status(401).json({ status: "fail", data: "unauthorized credential" });
+    res.status(401).json({ message: "unauthorized credential" });
   }
 };
 
 //deleteUser
 exports.deleteUser = (req, res) => {
-  const { userName, ...others } = req.body;
+  const { userName } = req.params;
 
-  if (req.userName) {
-    UserModel.aggregate(
-      [
-        {
-          $match: { userName: req.userName },
-        },
-      ],
-      (err, data) => {
-        if (err) {
-          console.log(err);
-          res
-            .status(500)
-            .json({ status: "fail", data: "there was a server side error" });
-        } else {
-          if (data && data.length > 0) {
-            UserModel.deleteOne({ userName: req.userName }, (err, data) => {
-              if (err) {
-                console.log(err);
-                res.status(500).json({
-                  status: "fail",
-                  data: "there was a server side error",
-                });
-              } else {
-                res.json({
-                  status: "success",
-                  data: "user delete successfull",
-                });
-              }
-            });
-          } else {
-            res.status(404).json({ status: "fail", data: "user not found" });
-          }
-        }
-      },
-    );
+  if (userName === req.userName) {
+    UserModel.deleteOne({ userName: req.userName }, (err, data) => {
+      if (err) {
+        console.log(err);
+        res.status(500).json({
+          message: "there was a server side error",
+        });
+      } else {
+        res.json({
+          message: "user delete successfull",
+        });
+      }
+    });
   } else {
-    res.status(401).json({ status: "fail", data: "unauthorized credential" });
+    res.status(401).json({ message: "unauthorized credential" });
   }
 };
