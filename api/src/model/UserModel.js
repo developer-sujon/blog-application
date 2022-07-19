@@ -35,7 +35,8 @@ const userScheme = Schema(
     },
     photo: {
       type: String,
-      default: "",
+      default:
+        "https://firebasestorage.googleapis.com/v0/b/portfolio-66931.appspot.com/o/client-3.png?alt=media&token=4f615887-cbda-49c9-b279-194fe7b7a802",
     },
     posts: [
       {

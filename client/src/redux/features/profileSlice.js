@@ -4,7 +4,7 @@ import { createSlice } from "@reduxjs/toolkit";
 const profileSlice = createSlice({
   name: "profile",
   initialState: {
-    value: [],
+    value: {},
   },
   reducers: {
     setProfile(state, action) {

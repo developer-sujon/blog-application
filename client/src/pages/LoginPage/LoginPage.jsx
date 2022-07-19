@@ -1,5 +1,5 @@
-import { useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useRef, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import ApiRequest from "../../APIRequest/ApiRequest";
 import FormValidation from "../../helper/FormValidation";
 import SessionHelper from "../../helper/SessionHelper";
@@ -8,6 +8,10 @@ import "./login.css";
 
 const LoginPage = () => {
   const navigate = useNavigate();
+
+  useEffect(() => {
+    window.scroll(0, 0);
+  }, []);
 
   let userName,
     password = useRef();
@@ -56,7 +60,9 @@ const LoginPage = () => {
         />
         <button className="loginButton">Login</button>
       </form>
-      <button className="loginRegisterButton">Register</button>
+      <Link to="/register" className="loginRegisterButton">
+        Register
+      </Link>
     </div>
   );
 };

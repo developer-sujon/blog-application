@@ -1,9 +1,33 @@
+import { useEffect } from "react";
+import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
+import ApiRequest from "../../APIRequest/ApiRequest";
 import SessionHelper from "../../helper/SessionHelper";
+import { setProfile } from "../../redux/features/profileSlice";
+import store from "../../redux/store/store";
 import "./topbar.css";
 
 const Topbar = () => {
-  const accessToken = SessionHelper.getToken() ?? null;
+  const profile = useSelector((state) => state.profile.value);
+  const accessToken = SessionHelper.getToken();
+
+  const selectProfile = () => {
+    accessToken &&
+      ApiRequest.getRequest("/user/selectUser").then((response) => {
+        if (response) {
+          store.dispatch(setProfile(response.data[0]));
+        }
+      });
+  };
+
+  useEffect(() => {
+    selectProfile();
+  }, []);
+
+  const logout = () => {
+    SessionHelper.removeToken();
+    window.location.href = "/login";
+  };
 
   return (
     <div className="top">
@@ -25,7 +49,11 @@ const Topbar = () => {
               WRITE
             </Link>
           </li>
-          {accessToken && <li className="topListItem">LOGOUT</li>}
+          {accessToken && (
+            <li className="topListItem" onClick={logout}>
+              LOGOUT
+            </li>
+          )}
         </ul>
       </div>
       <div className="topRight">
@@ -33,8 +61,8 @@ const Topbar = () => {
           <Link className="link" to="/settings">
             <img
               className="topImg"
-              src="https://images.pexels.com/photos/1858175/pexels-photo-1858175.jpeg?auto=compress&cs=tinysrgb&dpr=2&w=500"
-              alt=""
+              src={profile.photo}
+              alt={profile.userName}
             />
           </Link>
         ) : (

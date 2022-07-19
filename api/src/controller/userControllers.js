@@ -89,6 +89,32 @@ exports.loginUser = (req, res) => {
 
 //selectUser
 exports.selectUser = (req, res) => {
+  const userName = req.userName;
+
+  UserModel.aggregate(
+    [
+      {
+        $match: { userName: userName },
+      },
+    ],
+    (err, data) => {
+      if (err) {
+        console.log(err);
+        res.status(500).json({ data: "there was a server side error" });
+      } else {
+        if (data && data.length > 0) {
+          delete data[0].password;
+          res.json(data);
+        } else {
+          res.status(404).json({ message: "user not found" });
+        }
+      }
+    },
+  );
+};
+
+//selectUserByUserName
+exports.selectUserByUserName = (req, res) => {
   const { userName } = req.params;
   UserModel.aggregate(
     [
@@ -114,10 +140,8 @@ exports.selectUser = (req, res) => {
 
 //updateUser
 exports.updateUser = (req, res) => {
-  const { name, phone, photo } = req.body;
+  const { name, phone, photo, email } = req.body;
   const { userName } = req.params;
-
-  console.log(userName);
 
   if (userName === req.userName) {
     UserModel.aggregate(
@@ -133,7 +157,7 @@ exports.updateUser = (req, res) => {
         } else {
           UserModel.updateOne(
             { userName: userName },
-            { name, phone, photo },
+            { name, phone, photo, email },
             { new: true },
             (err, data) => {
               if (err) {

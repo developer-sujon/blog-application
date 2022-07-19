@@ -6,6 +6,7 @@ const {
   updateUser,
   selectUser,
   deleteUser,
+  selectUserByUserName,
 } = require("../controller/userControllers");
 const checkLogin = require("../middleware/authVerify");
 
@@ -16,7 +17,10 @@ userRoutes.post("/registrationUser", registrationUser);
 userRoutes.post("/loginUser", loginUser);
 
 //selectUser
-userRoutes.get("/selectUser/:userName", selectUser);
+userRoutes.get("/selectUser", checkLogin, selectUser);
+
+//selectUserByUserName
+userRoutes.get("/selectUserByUserName/:userName", selectUserByUserName);
 
 //updateUser
 userRoutes.patch("/updateUser/:userName", checkLogin, updateUser);

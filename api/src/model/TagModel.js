@@ -3,6 +3,10 @@ const { Schema, model } = require("mongoose");
 
 const tagScheme = Schema(
   {
+    tagId: {
+      type: String,
+      default: Math.round(new Date().getTime() / 1000),
+    },
     name: {
       type: String,
       unique: true,

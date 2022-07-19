@@ -14,13 +14,13 @@ const {
 postRoutes.post("/createPost", checkLogin, createPost);
 
 //selectPost
-postRoutes.get("/selectPost/:postId", selectPost);
+postRoutes.get("/selectPost/:slug", selectPost);
 
 //updatePost
-postRoutes.patch("/updatePost/:postId", checkLogin, updatePost);
+postRoutes.patch("/updatePost/:slug", checkLogin, updatePost);
 
 //deletePost
-postRoutes.delete("/deletePost/:postId", checkLogin, deletePost);
+postRoutes.delete("/deletePost/:slug", checkLogin, deletePost);
 
 //selectAllPost
 postRoutes.get("/selectAllPost", selectAllPost);

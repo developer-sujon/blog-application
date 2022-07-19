@@ -8,6 +8,11 @@ const postScheme = Schema(
       required: true,
       unique: true,
     },
+    slug: {
+      type: String,
+      required: true,
+      unique: true,
+    },
     body: {
       type: String,
       required: true,
@@ -21,18 +26,12 @@ const postScheme = Schema(
       type: String,
       default: "https://www.allbusiness.com/asset/2017/12/Blog-concept.jpg",
     },
-    categories: [
-      {
-        type: Schema.Types.ObjectId,
-        ref: "Category",
-      },
-    ],
-    tags: [
-      {
-        type: Schema.Types.ObjectId,
-        ref: "Tag",
-      },
-    ],
+    categories: {
+      type: [String],
+    },
+    tags: {
+      type: [String],
+    },
     user: {
       type: String,
       required: true,

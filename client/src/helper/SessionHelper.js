@@ -5,8 +5,8 @@ class SessionHelper {
   static getToken() {
     return sessionStorage.getItem("accessToken");
   }
-  static removeToken(key) {
-    return sessionStorage.removeItem(key);
+  static removeToken() {
+    return sessionStorage.removeItem("accessToken");
   }
   static setUserDetails(user) {
     sessionStorage.setItem("user", JSON.stringify(user));
@@ -14,8 +14,8 @@ class SessionHelper {
   static getUserDetails() {
     return JSON.parse(sessionStorage.getItem("user"));
   }
-  static removeUserDetails(key) {
-    return sessionStorage.removeItem(key);
+  static removeUserDetails() {
+    return sessionStorage.removeItem("user");
   }
 }
 

@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Suspense, lazy } from "react";
 import LazyLoader from "../../components/MasterLayout/LazyLoader";
 
@@ -6,6 +7,10 @@ const Posts = lazy(() => import("../../components/Posts/Posts"));
 const Sidebar = lazy(() => import("../../components/Sidebar/Sidebar"));
 
 const HomePage = () => {
+  useEffect(() => {
+    window.scroll(0, 0);
+  }, []);
+
   return (
     <Suspense fallback={LazyLoader}>
       <Header />

@@ -1,12 +1,17 @@
-import { useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useRef } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import ApiRequest from "../../APIRequest/ApiRequest";
 import ToastMessage from "../../helper/ToastMessage";
 import "./register.css";
+import FormValidation from "../../helper/FormValidation";
 
 const RegisterPage = () => {
   const loder = useSelector((state) => state.setting.isLoading);
+
+  useEffect(() => {
+    window.scroll(0, 0);
+  }, []);
 
   const navigate = useNavigate();
 
@@ -25,16 +30,24 @@ const RegisterPage = () => {
       password: password.value,
     };
 
-    ApiRequest.postRequest("/user/registrationUser", postJson).then(
-      (result) => {
-        if (result) {
-          ToastMessage.successMessage("User Registration Successfull");
-          navigate("/login");
-        } else {
-          ToastMessage.errorMessage("User Registration Failure");
-        }
-      },
-    );
+    if (FormValidation.isEmpty(userName.value)) {
+      ToastMessage.errorMessage("User Name is Required");
+    } else if (!FormValidation.isEmail(email.value)) {
+      ToastMessage.errorMessage("Invalid Email Address");
+    } else if (!FormValidation.isMobile(phone.value)) {
+      ToastMessage.errorMessage("Invalid Phone Number");
+    } else if (FormValidation.isEmpty(password.value)) {
+      ToastMessage.errorMessage("Password is Required");
+    } else {
+      ApiRequest.postRequest("/user/registrationUser", postJson).then(
+        (result) => {
+          if (result) {
+            ToastMessage.successMessage("User Registration Successfull");
+            navigate("/login");
+          }
+        },
+      );
+    }
   };
 
   return (
@@ -73,7 +86,9 @@ const RegisterPage = () => {
           {loder ? "Register .." : "Register"}
         </button>
       </form>
-      <button className="registerLoginButton">Login</button>
+      <Link to="/login" className="registerLoginButton">
+        Login
+      </Link>
     </div>
   );
 };

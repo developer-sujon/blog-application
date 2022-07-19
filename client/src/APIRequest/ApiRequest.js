@@ -24,13 +24,16 @@ class ApiRequest {
         }
       })
       .catch((err) => {
-        store.dispatch(setLoading());
+        store.dispatch(removeLoading());
         if (err.response.status === 401) {
+          SessionHelper.removeToken();
           ToastMessage.errorMessage(err.response.data.message);
+          window.location.href = "/login";
+          return false;
         } else {
           ToastMessage.errorMessage(err.response.data.message);
+          return false;
         }
-        return false;
       });
   }
 
@@ -47,44 +50,71 @@ class ApiRequest {
       .catch((err) => {
         store.dispatch(removeLoading());
         console.log(err);
-        if (err.response.status === 401) {
+        if (err.response.status === 409) {
           ToastMessage.errorMessage(err.response.data.message);
+          return false;
+        } else if (err.response.status === 401) {
+          SessionHelper.removeToken();
+          ToastMessage.errorMessage(err.response.data.message);
+          window.location.href = "/login";
+          return false;
         } else {
           ToastMessage.errorMessage(err.response.data.message);
+          return false;
         }
-        return false;
       });
   }
 
   static updateRequest(url, postJson) {
+    store.dispatch(setLoading());
     return axios
-      .update(url, postJson)
+      .patch(url, postJson)
       .then((response) => {
+        store.dispatch(removeLoading());
         if (response.status === 200) {
-          return response;
-        } else {
-          return false;
+          return true;
         }
       })
       .catch((err) => {
+        store.dispatch(removeLoading());
         console.log(err);
-        return null;
+        if (err.response.status === 409) {
+          ToastMessage.errorMessage(err.response.data.message);
+          return false;
+        } else if (err.response.status === 401) {
+          SessionHelper.removeToken();
+          ToastMessage.errorMessage(err.response.data.message);
+          window.location.href = "/login";
+          return false;
+        } else {
+          ToastMessage.errorMessage(err.response.data.message);
+          return false;
+        }
       });
   }
 
   static deleteRequest(url) {
+    store.dispatch(setLoading());
     return axios
       .delete(url)
       .then((response) => {
+        store.dispatch(setLoading());
         if (response.status === 200) {
-          return response;
-        } else {
-          return false;
+          return true;
         }
       })
       .catch((err) => {
+        store.dispatch(removeLoading());
         console.log(err);
-        return false;
+        if (err.response.status === 401) {
+          SessionHelper.removeToken();
+          ToastMessage.errorMessage(err.response.data.message);
+          window.location.href = "/login";
+          return false;
+        } else {
+          ToastMessage.errorMessage(err.response.data.message);
+          return false;
+        }
       });
   }
 }

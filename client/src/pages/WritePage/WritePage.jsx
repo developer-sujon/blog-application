@@ -1,6 +1,11 @@
+import { useEffect } from "react";
 import "./write.css";
 
 const WritePage = () => {
+  useEffect(() => {
+    window.scroll(0, 0);
+  }, []);
+
   return (
     <div className="write">
       <img

@@ -25,6 +25,7 @@ const Posts = () => {
           {posts.map(
             ({
               _id,
+              slug,
               title,
               body,
               photo,
@@ -51,7 +52,7 @@ const Posts = () => {
                         })}
                     </div>
                     <span className="postTitle">
-                      <Link to={`/post/${_id}`} className="link">
+                      <Link to={`/post/${slug}`} className="link">
                         {title}
                       </Link>
                     </span>
