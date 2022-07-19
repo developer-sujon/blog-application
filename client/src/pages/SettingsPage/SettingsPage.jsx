@@ -70,17 +70,17 @@ const SettingsPage = () => {
   };
 
   const deleteAccout = () => {
-    ApiRequest.deleteRequest("/user/deleteUser/" + profile.userName).then(
-      (result) => {
-        if (result) {
-          if (window.confirm("Are You Sure")) {
+    if (window.confirm("Are You Sure")) {
+      ApiRequest.deleteRequest("/user/deleteUser/" + profile.userName).then(
+        (result) => {
+          if (result) {
             SessionHelper.removeToken();
             ToastMessage.successMessage("User Delete Successful");
             window.location.href = "/login";
           }
-        }
-      },
-    );
+        },
+      );
+    }
   };
 
   return (

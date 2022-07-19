@@ -7,26 +7,27 @@ const PostModel = require("../model/PostModel");
 
 //createPost
 exports.createPost = (req, res) => {
-  let { categories, tags, body, title } = req.body;
+  let { tagId, categoryId, body, title, photo } = req.body;
 
-  if (categories) {
-    categories = categories.split(",").map((item) => item.trim());
+  if (tagId) {
+    tagId = tagId.split(",").map((item) => item.trim());
   } else {
-    categories = [];
+    tagId = [];
   }
 
-  if (tags) {
-    tags = tags.split(",").map((item) => item.trim());
+  if (categoryId) {
+    categoryId = categoryId.split(",").map((item) => item.trim());
   } else {
-    tags = [];
+    categoryId = [];
   }
 
   const newPost = {
     body,
     title,
+    photo,
     slug: title.replaceAll(" ", "_").toLowerCase(),
-    categories,
-    tags,
+    tagId,
+    categoryId,
     user: req.userName,
   };
 
@@ -55,20 +56,21 @@ exports.createPost = (req, res) => {
 exports.selectPost = (req, res) => {
   PostModel.aggregate(
     [
+      { $sort: { _id: -1 } },
       { $match: { slug: req.params.slug } },
       {
         $lookup: {
           from: "categories",
-          localField: "categories",
-          foreignField: "categories",
+          localField: "categoryId",
+          foreignField: "categoryId",
           as: "categories",
         },
       },
       {
         $lookup: {
           from: "tags",
-          localField: "tags",
-          foreignField: "tags",
+          localField: "tagId",
+          foreignField: "tagId",
           as: "tags",
         },
       },
@@ -175,6 +177,7 @@ exports.selectAllPost = (req, res) => {
       if (user) {
         PostModel.aggregate(
           [
+            { $sort: { _id: -1 } },
             { $match: { user } },
             {
               $lookup: {
@@ -207,6 +210,7 @@ exports.selectAllPost = (req, res) => {
       } else if (category) {
         PostModel.aggregate(
           [
+            { $sort: { _id: -1 } },
             { $match: { category: { $in: [category] } } },
             {
               $lookup: {
@@ -239,6 +243,7 @@ exports.selectAllPost = (req, res) => {
       } else if (tag) {
         PostModel.aggregate(
           [
+            { $sort: { _id: -1 } },
             { $match: { tag: { $in: [tag] } } },
             {
               $lookup: {
@@ -269,6 +274,7 @@ exports.selectAllPost = (req, res) => {
       } else {
         PostModel.aggregate(
           [
+            { $sort: { _id: -1 } },
             {
               $lookup: {
                 from: "categories",

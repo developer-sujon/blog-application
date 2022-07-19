@@ -40,18 +40,39 @@ const Posts = () => {
                   <img className="postImg" src={photo} alt="" />
                   <div className="postInfo">
                     <div className="postCats">
+                      Categorys:{" "}
                       {categories &&
                         categories.map((cat) => {
                           return (
                             <span className="postCat">
-                              <Link className="link" to="/posts?cat=Music">
-                                Music
+                              <Link
+                                className="link"
+                                to={`/post?category=${cat.name}`}
+                              >
+                                {cat.name} ,
+                              </Link>
+                            </span>
+                          );
+                        })}
+                    </div>
+                    <div className="postCats">
+                      Tags:{" "}
+                      {tags &&
+                        tags.map((tag) => {
+                          return (
+                            <span className="postCat">
+                              <Link
+                                className="link"
+                                to={`/post?tag=${tag.name}`}
+                              >
+                                {tag.name} ,
                               </Link>
                             </span>
                           );
                         })}
                     </div>
                     <span className="postTitle">
+                      Title:{" "}
                       <Link to={`/post/${slug}`} className="link">
                         {title}
                       </Link>

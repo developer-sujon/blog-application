@@ -26,10 +26,10 @@ const postScheme = Schema(
       type: String,
       default: "https://www.allbusiness.com/asset/2017/12/Blog-concept.jpg",
     },
-    categories: {
+    categoryId: {
       type: [String],
     },
-    tags: {
+    tagId: {
       type: [String],
     },
     user: {
