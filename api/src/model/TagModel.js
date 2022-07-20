@@ -4,7 +4,7 @@ const { Schema, model } = require("mongoose");
 const tagScheme = Schema(
   {
     tagId: {
-      type: String,
+      type: Number,
       default: function () {
         return Math.floor(Date.now() / 1000);
       },
